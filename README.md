@@ -1,7 +1,7 @@
 # GAN
-Implement published GAN using PyTorch
+Refactory published GAN using PyTorch
 
-Implemented Models
+Table of Models
 -----------
 |Name|Published Year|Implemented|
 |:------|:---|:---|
