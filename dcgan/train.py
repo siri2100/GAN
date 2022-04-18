@@ -61,7 +61,7 @@ class Main:
         self.optimizer_d = torch.optim.Adam(self.discriminator.parameters(), lr=LR, betas=(BETA1, BETA2), eps=1e-8)
 
         # Step 06. Tensorboard
-        # self.writer = SummaryWriter(f'{self.path_model}/tensorboard')
+        self.writer = SummaryWriter(f'{self.path_model}/tensorboard')
 
     def __call__(self, epoch):
         epoch_model = f'{epoch + 1}'.rjust(3, "0")
