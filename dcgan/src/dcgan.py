@@ -19,7 +19,7 @@ class Generator(nn.Module):
         self.tanh = nn.Tanh()
         self._weight_init()
 
-    def forward(self, input, _):
+    def forward(self, input):
         x1 = self.relu(self.bn1(self.deconv1(input)))
         x2 = self.relu(self.bn2(self.deconv2(x1)))
         x3 = self.relu(self.bn3(self.deconv3(x2)))
@@ -57,7 +57,7 @@ class Discriminator(nn.Module):
         self.lrelu = nn.LeakyReLU(0.2, inplace=True)
         self._weight_init()
         
-    def forward(self, input, _):
+    def forward(self, input):
         x1 = self.lrelu(self.conv1(input))
         x2 = self.lrelu(self.bn2(self.conv2(x1)))
         x3 = self.lrelu(self.bn3(self.conv3(x2)))
