@@ -29,7 +29,7 @@ class Main:
 
         # Step 01. Path
         self.path_parent = os.path.abspath('../..')
-        self.path_model = f'{self.path_parent}/data/dst/DCGAN_{EXP_NAME}/models'
+        self.path_model = f'{self.path_parent}/data/dst/DCGAN_{DATASET}_{EXP_NAME}/models'
         self.path_dataset = f'{self.path_parent}/data/src/{DATASET}'
         os.makedirs(f'{self.path_model}/tensorboard', exist_ok=True)
         
