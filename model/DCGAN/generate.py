@@ -34,7 +34,7 @@ class Main:
         self.path_image_dst = f'{self.path_parent}/data/dst/DCGAN_{EXP_NAME}/images_{self.epoch}epoch'
         os.makedirs(self.path_image_dst, exist_ok=True)
       
-        # 03. Set Model
+        # Step 02. Set Model
         self.generator = dcgan.Generator(DIM_X, DIM_Z)
         self.generator.load_state_dict(torch.load(self.path_model, map_location=DEVICE))
         self.generator.eval()
