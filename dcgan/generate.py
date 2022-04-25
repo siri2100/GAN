@@ -13,7 +13,7 @@ EPOCH_INIT = 1
 EPOCH_FINE = 1
 NUM_FAKE_IMG = 10
 DTYPE = 'torch.FloatTensor'
-DEVICE = 'cpu' 
+DEVICE = 'cuda' 
 BATCH_SIZE = 1
 NUM_WORKER = 2
 
@@ -24,13 +24,14 @@ DIM_G_FEATURE = 64
 
 class Main:
     def __init__(self, epoch):
-        # 00. Set Constant & Variable
+        # Step 00. Set Constant & Variable
         self.epoch = f'{epoch}'.rjust(3, '0')
         self.device = torch.device(DEVICE)
 
-        # 01. Set Directory
-        self.path_model = f'./models/{EXP_NAME}/generator_{self.epoch}.pth'
-        self.path_image_dst = f'./data/dst/{EXP_NAME}/E{self.epoch}_image_{NUM_FAKE_IMG//1000}k'
+        # Step 01. Set Directory
+        self.path_parent = os.path.abspath('../..')
+        self.path_model = f'{self.path_parent}/data/dst/DCGAN_{EXP_NAME}/models/generator_{self.epoch}.pth'
+        self.path_image_dst = f'{self.path_parent}/data/dst/DCGAN_{EXP_NAME}/images_{self.epoch}epoch'
         os.makedirs(self.path_image_dst, exist_ok=True)
       
         # 03. Set Model
