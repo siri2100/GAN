@@ -24,12 +24,13 @@ DTYPE = 'torch.FloatTensor' # Floating Point Precision : torch.HalfTensor(fp16)(
 
 class Main:
     def __init__(self):
-        # 00. Set Constant & Variable
+        # Step 00. Set Constant & Variable
         self.device = torch.device(DEVICE)
 
         # Step 01. Path
-        self.path_model = f'./models/{EXP_NAME}'
-        self.path_dataset = f'./data/src/{DATASET}'
+        self.path_parent = os.path.abspath('../..')
+        self.path_model = f'{self.path_parent}/data/dst/DCGAN_{EXP_NAME}/models'
+        self.path_dataset = f'{self.path_parent}/data/src/{DATASET}'
         os.makedirs(f'{self.path_model}/tensorboard', exist_ok=True)
         
         # Step 02. Dataset
