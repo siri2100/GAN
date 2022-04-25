@@ -1,5 +1,4 @@
 import os
-import random
 
 import torch
 import torchvision.datasets as datasets
@@ -21,7 +20,6 @@ LOSS_A = -1
 LOSS_B = 1
 LOSS_C = 0
 
-# LSGAN
 DIM_X = 64          # Dimension of Image
 DIM_Z = 1024        # Dimension of Latent Space 
 DTYPE = 'torch.FloatTensor'  # Floating Point Precision : torch.HalfTensor(fp16)(only for gpu), torch.FloatTensor(fp32)
@@ -29,12 +27,13 @@ DTYPE = 'torch.FloatTensor'  # Floating Point Precision : torch.HalfTensor(fp16)
 
 class Main:
     def __init__(self):
-        # 00. Set Constant & Variable
+        # Step 00. Set Constant & Variable
         self.device = torch.device(DEVICE)
 
         # Step 01. Path
-        self.path_model = f'./models/{EXP_NAME}'
-        self.path_dataset = f'./data/src/{DATASET}'
+        self.path_parent = os.path.abspath('../..')
+        self.path_model = f'{self.path_parent}/data/dst/LSGAN_{EXP_NAME}/models'
+        self.path_dataset = f'{self.path_parent}/data/src/{DATASET}'
         os.makedirs(f'{self.path_model}/tensorboard', exist_ok=True)
         
         # Step 02. Dataset
