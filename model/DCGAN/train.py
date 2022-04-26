@@ -6,20 +6,23 @@ import torchvision.transforms as transforms
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
+from src.model import dcgan_ffhq_128x128
 
-from src.model import dcgan
 
-EXP_NAME = 'exp1'           # Experiment Name
-EPOCH = 300                 # Target Train Epoch
+''' Setting
+        DATASET         MODEL               DIM_X
+    01  FFHQ_128x128    dcgan_ffhq_128x128  128
+'''
 BATCH_SIZE = 128            # Batch Size
-DATASET = 'CelebA'          # CelebA, FFHQ_128x128, FFHQ_1024x1024
+DATASET = 'FFHQ_128x128'    # CelebA, FFHQ_128x128
 DEVICE = 'cuda'             # Computational Device : cpu, cuda
-LR = 3e-4                   # Learning Rate
-NUM_WORKER = 4              # Number of workers for dataloader
-
-DIM_X = 64                  # Dimension of Image
+DIM_X = 128                 # Dimension of Image
 DIM_Z = 100                 # Dimension of Latent Space 
 DTYPE = 'torch.FloatTensor' # Floating Point Precision : torch.HalfTensor(fp16)(only for gpu), torch.FloatTensor(fp32)
+EPOCH = 300                 # Target Train Epoch
+EXP_NAME = 'exp1'           # Experiment Name
+LR = 3e-4                   # Learning Rate
+NUM_WORKER = 4              # Number of workers for dataloader
 
 
 class Main:
@@ -36,18 +39,17 @@ class Main:
         # Step 02. Dataset
         train_set = datasets.ImageFolder(root=self.path_dataset,
                                          transform=transforms.Compose([
-                                            transforms.Resize(DIM_X),
-                                            transforms.CenterCrop(DIM_X),
                                             transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                                          ]))
         self.train_loader = torch.utils.data.DataLoader(train_set, BATCH_SIZE, shuffle=True, num_workers=NUM_WORKER)
 
         # Step 03. Model
-        self.generator = dcgan.Generator(DIM_X, DIM_Z)
+        if DATASET == 'FFHQ_128x128':
+            self.generator = dcgan_ffhq_128x128.Generator(DIM_X, DIM_Z)
+            self.discriminator = dcgan_ffhq_128x128.Discriminator(DIM_X)
         self.generator.to(self.device)
         self.generator.train()
-        self.discriminator = dcgan.Discriminator(DIM_X)
         self.discriminator.to(self.device)
         self.discriminator.train()
 
@@ -70,12 +72,12 @@ class Main:
             
             # Step 1. Update Discriminator
             self.discriminator.zero_grad()
-            real_lbl = torch.full((real_img.size(0),), 1, dtype=torch.float, device=DEVICE)
             real_out = self.discriminator(real_img).view(-1)
+            real_lbl = torch.full((real_out.size(0),), 1, dtype=torch.float, device=DEVICE)
             loss_d_real = self.loss(real_out, real_lbl)
             loss_d_real.backward()
-            fake_lbl = torch.full((real_img.size(0),), 0, dtype=torch.float, device=DEVICE)
-            latent_z = torch.randn(real_img.size(0), DIM_Z, 1, 1).type(DTYPE)
+            fake_lbl = torch.full((real_out.size(0),), 0, dtype=torch.float, device=DEVICE)
+            latent_z = torch.randn(real_out.size(0), DIM_Z, 1, 1).type(DTYPE)
             latent_z = latent_z.to(self.device)
             fake_img = self.generator(latent_z)
             fake_out = self.discriminator(fake_img.detach()).view(-1)
@@ -86,7 +88,7 @@ class Main:
             
             # Step 2. Update Generator
             self.generator.zero_grad()
-            fake_lbl = torch.full((real_img.size(0),), 1, dtype=torch.float, device=DEVICE)
+            fake_lbl = torch.full((real_out.size(0),), 1, dtype=torch.float, device=DEVICE)
             fake_out = self.discriminator(fake_img).view(-1)
             loss_g = self.loss(fake_out, fake_lbl)
             loss_g.backward()
