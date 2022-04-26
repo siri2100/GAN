@@ -35,7 +35,8 @@ class Main:
         os.makedirs(self.path_image_dst, exist_ok=True)
       
         # Step 02. Set Model
-        self.generator = dcgan_ffhq_128x128.Generator(DIM_X, DIM_Z)
+        if DATASET == 'FFHQ_128x128':
+            self.generator = dcgan_ffhq_128x128.Generator(DIM_X, DIM_Z)
         self.generator.load_state_dict(torch.load(self.path_model, map_location=DEVICE))
         self.generator.eval()
         self.generator.to(self.device)
