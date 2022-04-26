@@ -5,20 +5,17 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from src.model import lsgan
+from src.model import lsgan_ffhq_128x128
 
 
-EXP_NAME = 'exp1'
+DATASET = 'FFHQ_128x128'
+DEVICE = 'cuda'
+DIM_X = 128         
+DIM_Z = 1024         
 EPOCH_INIT = 1
-EPOCH_FINE = 1
+EPOCH_FINE = 300
+EXP_NAME = 'exp1'
 NUM_FAKE_IMG = 10
-DATASET = 'CelebA'  # CelebA, FFHQ_128x128, FFHQ_1024x1024
-DEVICE = 'cuda'     # Computational Device : cpu, cuda
-NUM_WORKER = 2      # Number of workers for dataloader
-
-DIM_X = 64          # Dimension of Image
-DIM_Z = 1024        # Dimension of Latent Space 
-DTYPE = 'torch.FloatTensor'  # Floating Point Precision : torch.HalfTensor(fp16)(only for gpu), torch.FloatTensor(fp32)
 
 
 class Main:
@@ -29,14 +26,16 @@ class Main:
 
         # Step 01. Path
         self.path_parent = os.path.abspath('../..')
-        self.path_model = f'{self.path_parent}/data/dst/LSGAN_{EXP_NAME}/models/generator_{self.epoch}.pth'
-        self.path_image_dst = f'{self.path_parent}/data/dst/LSGAN_{EXP_NAME}/images_{self.epoch}epoch'
+        self.path_model = f'{self.path_parent}/data/dst/LSGAN_{DATASET}_{EXP_NAME}/models/generator_{self.epoch}.pth'
+        self.path_image_dst = f'{self.path_parent}/data/dst/LSGAN_{DATASET}_{EXP_NAME}/images_{self.epoch}epoch'
         os.makedirs(self.path_image_dst, exist_ok=True)
       
         # Step 02. Model
-        self.generator = lsgan.Generator(DIM_X, DIM_Z)
+        if DATASET == 'FFHQ_128x128':
+            self.generator = lsgan_ffhq_128x128.Generator(DIM_X, DIM_Z)
         self.generator.load_state_dict(torch.load(self.path_model, map_location=DEVICE))
         self.generator.eval()
+        self.generator.to(self.device)
 
     def __call__(self):
         for idx_img in tqdm(range(NUM_FAKE_IMG)):
