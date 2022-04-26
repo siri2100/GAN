@@ -6,23 +6,22 @@ import torchvision.transforms as transforms
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from src.model import lsgan
+from src.model import lsgan_ffhq_128x128
 
 
-EXP_NAME = 'exp1'   # Experiment Name
-EPOCH = 100         # Target Train Epoch
-BATCH_SIZE = 128    # Batch Size
-DATASET = 'CelebA'  # CelebA, FFHQ_128x128, FFHQ_1024x1024
-DEVICE = 'cuda'     # Computational Device : cpu, cuda
-LR = 3e-4           # Learning Rate
-NUM_WORKER = 4      # Number of workers for dataloader
+BATCH_SIZE = 128            # Batch Size
+DATASET = 'FFHQ_128x128'    # CelebA, FFHQ_128x128, FFHQ_1024x1024
+DEVICE = 'cuda'             # Computational Device : cpu, cuda
+DIM_X = 128                 # Dimension of Image
+DIM_Z = 1024                # Dimension of Latent Space 
+DTYPE = 'torch.FloatTensor' # Floating Point Precision : torch.HalfTensor(fp16)(only for gpu), torch.FloatTensor(fp32)
+EXP_NAME = 'exp1'           # Experiment Name
+EPOCH = 3                 # Target Train Epoch
+LR = 3e-4                   # Learning Rate
 LOSS_A = -1
 LOSS_B = 1
 LOSS_C = 0
-
-DIM_X = 64          # Dimension of Image
-DIM_Z = 1024        # Dimension of Latent Space 
-DTYPE = 'torch.FloatTensor'  # Floating Point Precision : torch.HalfTensor(fp16)(only for gpu), torch.FloatTensor(fp32)
+NUM_WORKER = 4              # Number of workers for dataloader
 
 
 class Main:
@@ -39,18 +38,17 @@ class Main:
         # Step 02. Dataset
         train_set = datasets.ImageFolder(root=self.path_dataset,
                                          transform=transforms.Compose([
-                                            transforms.Resize(DIM_X),
-                                            transforms.CenterCrop(DIM_X),
                                             transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                                          ]))
         self.train_loader = torch.utils.data.DataLoader(train_set, BATCH_SIZE, shuffle=True, num_workers=NUM_WORKER)
 
         # Step 03. Model
-        self.generator = lsgan.Generator(DIM_X, DIM_Z)
+        if DATASET == 'FFHQ_128x128':
+            self.generator = lsgan_ffhq_128x128.Generator(DIM_X, DIM_Z)
+            self.discriminator = lsgan_ffhq_128x128.Discriminator(DIM_X)
         self.generator.to(self.device)
         self.generator.train()
-        self.discriminator = lsgan.Discriminator(DIM_X)
         self.discriminator.to(self.device)
         self.discriminator.train()
 
