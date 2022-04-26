@@ -5,21 +5,21 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from src.model import dcgan
+from model import dcgan_ffhq_128x128
 
 
-EXP_NAME = 'exp1'
-EPOCH_INIT = 1
-EPOCH_FINE = 1
-NUM_FAKE_IMG = 10
-DTYPE = 'torch.FloatTensor'
+''' Setting
+        DATASET         MODEL               DIM_X
+    01  FFHQ_128x128    dcgan_ffhq_128x128  128
+'''
+DATASET = 'FFHQ_128x128'
 DEVICE = 'cuda' 
-BATCH_SIZE = 1
-NUM_WORKER = 2
-
-DIM_X = 64
+DIM_X = 128
 DIM_Z = 100
-DIM_G_FEATURE = 64
+EPOCH_INIT = 1
+EPOCH_FINE = 300
+EXP_NAME = 'exp1'
+NUM_FAKE_IMG = 10
 
 
 class Main:
@@ -30,12 +30,12 @@ class Main:
 
         # Step 01. Set Directory
         self.path_parent = os.path.abspath('../..')
-        self.path_model = f'{self.path_parent}/data/dst/DCGAN_{EXP_NAME}/models/generator_{self.epoch}.pth'
-        self.path_image_dst = f'{self.path_parent}/data/dst/DCGAN_{EXP_NAME}/images_{self.epoch}epoch'
+        self.path_model = f'{self.path_parent}/data/dst/DCGAN_{DATASET}_{EXP_NAME}/models/generator_{self.epoch}.pth'
+        self.path_image_dst = f'{self.path_parent}/data/dst/DCGAN_{DATASET}_{EXP_NAME}/images_{self.epoch}epoch'
         os.makedirs(self.path_image_dst, exist_ok=True)
       
         # Step 02. Set Model
-        self.generator = dcgan.Generator(DIM_X, DIM_Z)
+        self.generator = dcgan_ffhq_128x128.Generator(DIM_X, DIM_Z)
         self.generator.load_state_dict(torch.load(self.path_model, map_location=DEVICE))
         self.generator.eval()
         self.generator.to(self.device)
