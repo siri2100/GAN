@@ -16,10 +16,10 @@ from src.model import dcgan_ffhq_128x128
 BATCH_SIZE = 128            # Batch Size
 DATASET = 'FFHQ_128x128'    # CelebA, FFHQ_128x128
 DEVICE = 'cuda'             # Computational Device : cpu, cuda
-DIM_X = 128                 # Dimension of Image
+DIM_X = 64                  # Dimension of Image
 DIM_Z = 100                 # Dimension of Latent Space 
 DTYPE = 'torch.FloatTensor' # Floating Point Precision : torch.HalfTensor(fp16)(only for gpu), torch.FloatTensor(fp32)
-EPOCH = 300                 # Target Train Epoch
+EPOCH = 200                 # Target Train Epoch
 EXP_NAME = 'exp1'           # Experiment Name
 LR = 3e-4                   # Learning Rate
 NUM_WORKER = 4              # Number of workers for dataloader
@@ -39,6 +39,8 @@ class Main:
         # Step 02. Dataset
         train_set = datasets.ImageFolder(root=self.path_dataset,
                                          transform=transforms.Compose([
+                                            transforms.Resize(DIM_X),
+                                            transforms.CenterCrop(DIM_X),
                                             transforms.ToTensor(),
                                             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                                          ]))
@@ -46,8 +48,8 @@ class Main:
 
         # Step 03. Model
         if DATASET == 'FFHQ_128x128':
-            self.generator = dcgan_ffhq_128x128.Generator(DIM_X, DIM_Z)
-            self.discriminator = dcgan_ffhq_128x128.Discriminator(DIM_X)
+            self.generator = dcgan_ffhq_128x128.Generator(DIM_Z)
+            self.discriminator = dcgan_ffhq_128x128.Discriminator()
         self.generator.to(self.device)
         self.generator.train()
         self.discriminator.to(self.device)
