@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from model import dcgan_ffhq_128x128
+from src.model import dcgan_ffhq_128x128
 
 
 ''' Setting
@@ -14,12 +14,11 @@ from model import dcgan_ffhq_128x128
 '''
 DATASET = 'FFHQ_128x128'
 DEVICE = 'cuda' 
-DIM_X = 128
 DIM_Z = 100
 EPOCH_INIT = 1
-EPOCH_FINE = 300
+EPOCH_FINE = 200
 EXP_NAME = 'exp1'
-NUM_FAKE_IMG = 10
+NUM_FAKE_IMG = 10000
 
 
 class Main:
@@ -36,7 +35,7 @@ class Main:
       
         # Step 02. Set Model
         if DATASET == 'FFHQ_128x128':
-            self.generator = dcgan_ffhq_128x128.Generator(DIM_X, DIM_Z)
+            self.generator = dcgan_ffhq_128x128.Generator(DIM_Z)
         self.generator.load_state_dict(torch.load(self.path_model, map_location=DEVICE))
         self.generator.eval()
         self.generator.to(self.device)
